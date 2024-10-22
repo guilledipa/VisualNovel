@@ -25,11 +25,12 @@ func (g *game) Update() error {
 
 func (g *game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(bg, nil)
-	screen.DrawImage(person, nil)
-	// Cat
+	screen.DrawImage(cat, nil)
+	// Person
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(560, 0)
-	screen.DrawImage(cat, op)
+	op.GeoM.Scale(-1, 1)
+	op.GeoM.Translate(1280, 0)
+	screen.DrawImage(person, op)
 	// Window
 	op = &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(10.8, 2.7)
