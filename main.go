@@ -41,7 +41,6 @@ func (g *game) Draw(screen *ebiten.Image) {
 	op = &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(-1, 1)
 	op.GeoM.Translate(1280, 0)
-	op.ColorScale.ScaleAlpha(0.5)
 	screen.DrawImage(person, op)
 	// Window
 	// Source rectangle, 9 equal parts
@@ -77,6 +76,7 @@ func (g *game) Draw(screen *ebiten.Image) {
 		op.GeoM.Scale(scaleX, scaleY)
 		op.GeoM.Translate(100, 450) // New "origin" for the image
 		op.GeoM.Translate(float64(dstRect.Min.X), float64(dstRect.Min.Y))
+		op.ColorScale.ScaleAlpha(0.5)
 		screen.DrawImage(subImage, op)
 	}
 	// Small image for name -- TODO refactor code (Create helper function)
