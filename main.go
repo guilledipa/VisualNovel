@@ -113,69 +113,26 @@ func (g *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func main() {
 	// Background
-	f, err := fsys.Open("assets/bg.jpeg")
+	var err error
+	bg, err = loadEmbededAsset(fsys, "assets/bg.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
-	img, _, err := image.Decode(f)
-	if err != nil {
-		panic(err)
-	}
-	img = ebiten.NewImageFromImage(img)
-	ebiImg, _, err := ebitenutil.NewImageFromFile("assets/bg.jpeg")
-	if err != nil {
-		log.Fatal(err)
-	}
-	bg = ebiImg
 	// Person
-	f, err = fsys.Open("assets/person.jpeg")
+	person, err = loadEmbededAsset(fsys, "assets/person.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
-	img, _, err = image.Decode(f)
-	if err != nil {
-		panic(err)
-	}
-	img = ebiten.NewImageFromImage(img)
-	ebiImg, _, err = ebitenutil.NewImageFromFile("assets/person.jpeg")
-	if err != nil {
-		log.Fatal(err)
-	}
-	person = ebiImg
 	// Cat
-	f, err = fsys.Open("assets/cat.jpeg")
+	cat, err = loadEmbededAsset(fsys, "assets/cat.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
-	img, _, err = image.Decode(f)
-	if err != nil {
-		panic(err)
-	}
-	img = ebiten.NewImageFromImage(img)
-	ebiImg, _, err = ebitenutil.NewImageFromFile("assets/cat.jpeg")
-	if err != nil {
-		log.Fatal(err)
-	}
-	cat = ebiImg
 	// Window
-	f, err = fsys.Open("assets/window.jpeg")
+	window, err = loadEmbededAsset(fsys, "assets/window.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
-	img, _, err = image.Decode(f)
-	if err != nil {
-		panic(err)
-	}
-	img = ebiten.NewImageFromImage(img)
-	ebiImg, _, err = ebitenutil.NewImageFromFile("assets/window.jpeg")
-	if err != nil {
-		log.Fatal(err)
-	}
-	window = ebiImg
 
 	ebiten.SetWindowTitle("Visual Novel Game")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
@@ -183,4 +140,22 @@ func main() {
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func loadEmbededAsset(fsys embed.FS, path string) (*ebiten.Image, error) {
+	f, err := fsys.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	img, _, err := image.Decode(f)
+	if err != nil {
+		return nil, err
+	}
+	img = ebiten.NewImageFromImage(img)
+	ebiImg, _, err := ebitenutil.NewImageFromFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return ebiImg, nil
 }
