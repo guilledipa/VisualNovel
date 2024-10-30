@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"image"
 	"log"
 
@@ -14,6 +15,9 @@ const (
 	screenWidth  = 1280
 	screenHeight = 720
 )
+
+//go:embed assets/*.jpeg
+var fsys embed.FS
 
 var (
 	bg     *ebiten.Image
@@ -108,26 +112,71 @@ func (g *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	img, _, err := ebitenutil.NewImageFromFile("./assets/bg.jpeg")
+	// Background
+	f, err := fsys.Open("assets/bg.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	bg = img
-	img, _, err = ebitenutil.NewImageFromFile("assets/person.jpeg")
+	defer f.Close()
+	img, _, err := image.Decode(f)
+	if err != nil {
+		panic(err)
+	}
+	img = ebiten.NewImageFromImage(img)
+	ebiImg, _, err := ebitenutil.NewImageFromFile("assets/bg.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	person = img
-	img, _, err = ebitenutil.NewImageFromFile("assets/cat.jpeg")
+	bg = ebiImg
+	// Person
+	f, err = fsys.Open("assets/person.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	cat = img
-	img, _, err = ebitenutil.NewImageFromFile("assets/window.jpeg")
+	defer f.Close()
+	img, _, err = image.Decode(f)
+	if err != nil {
+		panic(err)
+	}
+	img = ebiten.NewImageFromImage(img)
+	ebiImg, _, err = ebitenutil.NewImageFromFile("assets/person.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	window = img
+	person = ebiImg
+	// Cat
+	f, err = fsys.Open("assets/cat.jpeg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	img, _, err = image.Decode(f)
+	if err != nil {
+		panic(err)
+	}
+	img = ebiten.NewImageFromImage(img)
+	ebiImg, _, err = ebitenutil.NewImageFromFile("assets/cat.jpeg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	cat = ebiImg
+	// Window
+	f, err = fsys.Open("assets/window.jpeg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	img, _, err = image.Decode(f)
+	if err != nil {
+		panic(err)
+	}
+	img = ebiten.NewImageFromImage(img)
+	ebiImg, _, err = ebitenutil.NewImageFromFile("assets/window.jpeg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	window = ebiImg
+
 	ebiten.SetWindowTitle("Visual Novel Game")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	g := &game{}
