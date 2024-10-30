@@ -41,6 +41,7 @@ func (g *game) Draw(screen *ebiten.Image) {
 	op = &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(-1, 1)
 	op.GeoM.Translate(1280, 0)
+	op.ColorScale.Scale(0, 1, 0, 1) // R=0, G=1, B=0, A=1
 	screen.DrawImage(person, op)
 	// Window
 	// Source rectangle, 9 equal parts
