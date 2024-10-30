@@ -4,11 +4,14 @@ import (
 	"embed"
 	"image"
 	"log"
+	"os"
 
 	_ "image/jpeg"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 const (
@@ -26,10 +29,19 @@ var (
 	window *ebiten.Image
 )
 
+var (
+	fontFace *text.GoTextFace
+	ticks    = 0
+)
+
 type game struct {
 }
 
 func (g *game) Update() error {
+	ticks++
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		ticks = 0
+	}
 	return nil
 }
 
@@ -105,6 +117,27 @@ func (g *game) Draw(screen *ebiten.Image) {
 		op.GeoM.Translate(float64(dstRect.Min.X), float64(dstRect.Min.Y))
 		screen.DrawImage(subImage, op)
 	}
+	// Dialogue
+	textop := &text.DrawOptions{}
+	textop.LineSpacing = 30 * 1.5
+	textop.ColorScale.Scale(0, 0, 0, 1)
+	glyphs := text.AppendGlyphs(nil, "Hello world! I am a cat. No name yet.", fontFace, &textop.LayoutOptions)
+	length := ticks / 5 // Send 1 character every 5 ticks
+	for i, g := range glyphs {
+		if i > length {
+			break // Ends when the number of displayed characters is exceeded
+		}
+		textop.GeoM.Reset() // Reuse textop with all characters and reset only GeoM
+		textop.GeoM.Translate(200, 480)
+		textop.GeoM.Translate(g.X, g.Y)
+		screen.DrawImage(g.Image, &textop.DrawImageOptions)
+	}
+	// Name box
+	textop = &text.DrawOptions{}
+	w, h := text.Measure("Cat", fontFace, 30*1.5)
+	textop.GeoM.Translate(250-w/2, 430-h/2)
+	textop.ColorScale.Scale(0, 0, 0, 1)
+	text.Draw(screen, "Cat", fontFace, textop)
 }
 
 func (g *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -133,6 +166,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// Fonts
+	f, err := os.Open("assets/NotoSans-Regular.ttf")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	src, err := text.NewGoTextFaceSource(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fontFace = &text.GoTextFace{Source: src, Size: 30}
 
 	ebiten.SetWindowTitle("Visual Novel Game")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
